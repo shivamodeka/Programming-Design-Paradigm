@@ -1,0 +1,364 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname q1) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+(require rackunit)
+(require "extras.rkt")
+(check-location "08" "q1.rkt")
+
+(provide tie
+         ties?
+         defeat?
+         ties-defeat
+         ties-defeat-inv
+         defeat-winner
+         defeat-loser
+         defeat-list
+         defeated
+         defeated?
+         outranks
+         outranked-by)
+
+;; A Competitor is represented as a String (any string will do).
+
+;; An Outcome is one of
+;;     -- a Tie
+;;     -- a Defeat
+;;
+;; OBSERVER TEMPLATE:
+;; outcome-fn : Outcome -> ??
+#;
+(define (outcome-fn o)
+  (cond ((tie? o) ...)
+        ((defeat? o) ...)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; REPRESENTATION OF DEFEAT
+
+;; A Defeat is represented as a struct
+;; (make-defeat winner loser) with the folowing fields
+
+;; winner : Competitor is the winning contestant
+;; loser  : Competitor is the losing contestant
+
+;; IMPLEMENTATION
+(define-struct defeat (winner loser))
+
+;; CONSTRUCTOR TEMPLATE:
+;; (make-defeat String String)
+
+;; OBSERVER TEMPLATE
+;; defeat-fn : Defeat -> ??
+
+#| (define (defeat-fn d)
+      (... (defeat-winner d)
+           (defeat-loser d)))
+|#
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; REPRESENTATION OF TIE
+
+;; A Tie is represented as a struct
+;; (make-ties defeat defeat-inv) with the folowing fields
+
+;; defeat      : Defeat is the struct representing winner and loser
+;; defeat-inv  : Defeat is the struct representing inverse of defeat
+
+;; IMPLEMENTATION
+(define-struct ties (defeat defeat-inv))
+
+;; CONSTRUCTOR TEMPLATE:
+;; (make-ties Defeat Defeat)
+
+;; OBSERVER TEMPLATE
+;; tie-fn : Tie -> ??
+
+#| (define (tie-fn t)
+      (... (ties-defeat t)
+           (ties-defeat-inv t)))
+|#
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; tie : Competitor Competitor -> Tie
+;; GIVEN: the names of two competitors
+;; RETURNS: an indication that the two competitors have
+;;     engaged in a contest, and the outcome was a tie
+;; EXAMPLE: (see the examples given below for defeated?,
+;;     which shows the desired combined behavior of tie
+;;     and defeated?)
+;; STRATEGY: Use constructor template for Tie
+
+(define (tie comp1 comp2)
+  (make-ties (make-defeat comp1 comp2) (make-defeat comp2 comp1)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; defeated : Competitor Competitor -> Defeat
+;; GIVEN: the names of two competitors
+;;     engaged in a contest, with the first competitor
+;;     defeating the second
+;; EXAMPLE: (see the examples given below for defeated?,
+;;     which shows the desired combined behavior of defeated
+;;     and defeated?)
+;; STRATEGY: Use constructor template for Defeat
+
+(define (defeated comp1 comp2)
+  (make-defeat comp1 comp2))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; defeated? : Competitor Competitor OutcomeList -> Boolean
+;; GIVEN: the names of two competitors and a list of outcomes
+;; RETURNS: true if and only if one or more of the outcomes indicates
+;;     the first competitor has defeated or tied the second
+;; EXAMPLES:
+;;     (defeated? "A" "B" (list (defeated "A" "B") (tie "B" "C")))
+;;  => true
+;;
+;;     (defeated? "A" "C" (list (defeated "A" "B") (tie "B" "C")))
+;;  => false
+;; STRATEGY: Check for the struct in defeat list
+
+(define (defeated? comp1 comp2 lst)
+  (member (make-defeat comp1 comp2) (defeat-list lst)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; defeat-list : OutcomeList -> OutcomeList
+;; GIVEN: the outcome list
+;; RETURNS: a simplified outcome list in terms of defeats
+;; EXAMPLES:
+;;     (defeat-list (list (defeated "A" "B") (tie "B" "C")))
+;;  => (list (make-defeat "A" "B") (make-defeat "B" "C") (make-defeat "C" "B"))
+;; STRATEGY: Use HOF foldr and lambda on lst
+
+(define (defeat-list lst)
+  (foldr
+   (lambda (n m) (if (ties? n)
+                     (cons (ties-defeat n)
+                           (cons (ties-defeat-inv n) m))
+                     (cons n m))) empty lst))
+
+;;TESTS
+
+(begin-for-test
+  (check-equal?
+   (defeated? "B" "C" (list (defeated "A" "B") (tie "B" "C")))
+   true
+   "Should return a true")
+  (check-equal?
+   (defeated? "A" "B" (list (defeated "A" "B") (tie "B" "C")))
+   true
+   "Should return a true")
+  (check-equal?
+   (defeated? "A" "C" (list (defeated "A" "B") (tie "B" "C")))
+   false
+   "Should return a false")
+  (check-equal?
+   (defeated? "B" "A" (list (defeated "A" "B") (tie "B" "C")))
+   false
+   "Should return a false")
+  (check-equal?
+   (defeated? "C" "B" (list (defeated "A" "B") (tie "B" "C")))
+   true
+   "Should return a true"))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; outranks : Competitor OutcomeList -> CompetitorList
+;; GIVEN: the name of a competitor and a list of outcomes
+;; RETURNS: a list of the competitors outranked by the given
+;; competitor, in alphabetical order
+;; NOTE: it is possible for a competitor to outrank itself
+;; EXAMPLES:
+;;     (outranks "A" (list (defeated "A" "B") (tie "B" "C")))
+;;  => (list "B" "C")
+;;
+;;     (outranks "B" (list (defeated "A" "B") (defeated "B" "A")))
+;;  => (list "A" "B")
+;;
+;;     (outranks "C" (list (defeated "A" "B") (tie "B" "C")))
+;;  => (list "B" "C")
+;; STRATEGY: Use a more general function
+
+(define (outranks comp olst)
+  (sort
+   (outcome comp (defeat-list olst) (list) 0) string<?))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; outcome : Competitor OutcomeList StringList Non-negInt -> CompetitorList
+;; GIVEN: the name of a competitor a list of outcomes, a string list and a
+;; non negative integer n
+;; WHERE: StringList contains all the outcomes of outranks of the competitors 
+;; till position n in the StringList
+;; AND: n <= length of StringList
+;; RETURNS: a list of the competitors outranked by the given
+;; competitor
+;; EXAMPLES:
+;;     (outcome "B" (list (defeated "A" "B") (defeated "B" "A")) (list) 0)
+;;  => (list "A" "B")
+;; STRATEGY: Combine simpler functions
+
+(define (outcome comp olst lst n)
+  (check-outranks-again
+   (check-outranks comp olst lst) olst n))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; check-outranks : Competitor OutcomeList StringList -> CompetitorList
+;; GIVEN: the name of a competitor a list of outcomes and a string list 
+;; WHERE: StringList contains all the outcomes of outranks of the competitors 
+;; till that competitor in the StringList
+;; RETURNS: a list of the competitors outranked by the given competitor
+;; EXAMPLES:
+;;     (check-outranks "A" (list (defeated "A" "B") (defeated "B" "A")) (list))
+;;  => (list "A" "B")
+;; STRATEGY: Use HOF foldr and lambda on olst
+
+(define (check-outranks comp olst lst)
+  (foldr
+   (lambda (n m)
+     (if (and (string=? comp (defeat-winner n))
+              (not (member (defeat-loser n) m)))        
+         (append m (list (defeat-loser n)))
+         m)) lst olst))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; check-outranks-again : StringList OutcomeList Non-negInt -> CompetitorList
+;; GIVEN: the string list, a list of outcomes and a non negative integer 
+;; WHERE: StringList contains all the outcomes of outranks of the competitors 
+;; till that competitor at position n in the StringList
+;; AND: n<= length of string list
+;; RETURNS: a list of the competitors outranked by the given competitor
+;; EXAMPLES:
+;;     (check-outranks-again (list "A" "B")
+;;              (list (defeated "A" "B") (defeated "B" "A")) 2)
+;;  => (list "A" "B")
+;; STRATEGY: Recur on lst
+;; HALTING MEASURE: (length lst) - n
+
+(define (check-outranks-again lst olst n) 
+  (if (= n (length lst))
+      lst
+      (outcome (list-ref lst n) olst lst (+ 1 n))))
+
+
+;;TESTS
+
+(begin-for-test
+  (check-equal?
+   (outranks "A" (list (defeated "A" "B") (tie "B" "C")(defeated "A" "F")))
+   (list "B" "C" "F")
+   "Incorrect result from outranks")
+  (check-equal?
+   (outranks "B" (list (defeated "A" "B") (defeated "B" "A")))
+   (list "A" "B")
+   "Incorrect result from outranks")
+  (check-equal?
+   (outranks "C" (list (defeated "A" "B") (tie "B" "C")))
+   (list "B" "C")
+   "Incorrect result from outranks")
+  (check-equal?
+   (outranks "A" (list (tie "B" "C")))
+   (list)
+   "Incorrect result from outranks")
+  (check-equal?
+   (outranks "A" (list (tie "B" "C") (defeated "A" "B") (tie "D" "E")
+                       (defeated "C" "D") (defeated "A" "F")))
+   (list "B" "C" "D" "E" "F")
+   "Incorrect result from outranks"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; outranked-by : Competitor OutcomeList -> CompetitorList
+;; GIVEN: the name of a competitor and a list of outcomes
+;; RETURNS: a list of the competitors that outrank the given
+;;     competitor, in alphabetical order
+;; NOTE: it is possible for a competitor to outrank itself
+;; EXAMPLES:
+;;     (outranked-by "A" (list (defeated "A" "B") (tie "B" "C")))
+;;  => (list)
+;;
+;;     (outranked-by "B" (list (defeated "A" "B") (defeated "B" "A")))
+;;  => (list "A" "B")
+;;
+;;     (outranked-by "C" (list (defeated "A" "B") (tie "B" "C")))
+;;  => (list "A" "B" "C")
+;; STRATEGY: Use a more general function
+
+(define (outranked-by comp olst)
+  (sort
+   (outrankers comp (defeat-list olst) (list) 0) string<?))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; outrankers : Competitor OutcomeList StringList Non-negInt -> CompetitorList
+;; GIVEN: the name of a competitor a list of outcomes, a string list and a
+;; non negative integer n
+;; WHERE: StringList contains all the outranked-by of the competitors 
+;; till position n in the StringList
+;; AND: n <= length of StringList
+;; RETURNS: a list of the competitors outranking the given competitor
+;; EXAMPLES:
+;;     (outrankers "B" (list (defeated "A" "B") (defeated "B" "A")) (list) 0)
+;;  => (list "A" "B")
+;; STRATEGY: Combine simpler functions
+
+(define (outrankers comp olst lst n)
+  (find-outrankers-again
+   (find-outrankers comp olst lst) olst n))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; find-outrankers : Competitor OutcomeList StringList -> CompetitorList
+;; GIVEN: the name of a competitor a list of outcomes and a string list 
+;; WHERE: StringList contains all the outranked-by of the competitors 
+;; till that competitor in the StringList
+;; RETURNS: a list of the competitors outranking the given competitor
+;; EXAMPLES:
+;;     (find-outrankers "A" (list (defeated "A" "B") (defeated "B" "A")) (list))
+;;  => (list "A" "B")
+;; STRATEGY: Use HOF foldr and lambda on olst
+
+(define (find-outrankers comp olst lst)
+  (foldr
+   (lambda (n m)
+     (if (and (string=? comp (defeat-loser n))
+              (not (member (defeat-winner n) m)))
+         (append m (list (defeat-winner n)))
+         m)) lst olst))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; find-outrankers-again : StringList OutcomeList Non-negInt -> CompetitorList
+;; GIVEN: the string list, a list of outcomes and a non negative integer 
+;; WHERE: StringList contains all the outranked-by of the competitors 
+;; till that competitor at position n in the StringList
+;; AND: n<= length of string list
+;; RETURNS: a list of the competitors outranking the given competitor
+;; EXAMPLES:
+;;     (find-outrankers-again (list "A" "B")
+;;              (list (defeated "A" "B") (defeated "B" "A")) 2)
+;;  => (list "A" "B")
+;; STRATEGY: Recur on lst
+;; HALTING MEASURE: (length lst) - n
+
+(define (find-outrankers-again lst olst n) 
+  (if (= n (length lst))
+      lst
+      (outrankers (list-ref lst n) olst lst (+ 1 n))))
+
+;;TESTS
+
+(begin-for-test
+  (check-equal?
+   (outranked-by "E" (list (tie "B" "C") (defeated "A" "B") (tie "D" "E")
+                       (defeated "C" "D") (defeated "A" "F")))
+   (list "A" "B" "C" "D" "E")
+   "Incorrect result from outranked-by"))

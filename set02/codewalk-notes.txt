@@ -1,0 +1,55 @@
+TA-1 Name: - Harshit Vora
+TA-2 Name: - Nisarg Shah
+
+Student CCIS ID: shivamodeka
+
+Problem Set #: set02
+Question Codewalked: - Q2
+
+Design Grade: - A
+Presentation Grade: - A
+
+================
+
+Examples and Tests:
+
+-- 100% test coverage
+
+================
+
+Data Design:
+
+-- missing/incomplete interpretation.  
+Incorrect interpratation for state, should be current state of traffic signal
+
+-- missing/incorrect templates.
+Missing contract in observer template for ChineseTrafficSignal
+
+-- Define constants to avoid magic number and magic strings
+
+================
+
+Contract/Purpose Statement/Design Strategy:
+
+-- function definition too complicated or obscure
+"next-state" function is too complicated. Break down into helper functions, observe one variable at a time
+
+================
+
+Presentation:
+
+-- Student answered all questions and gave a good presentation.
+
+================
+
+Other:
+
+-- Try not to exceed the 80 character limit
+
+-- Error messages are helpful for test cases
+
+================
+
+
+
+

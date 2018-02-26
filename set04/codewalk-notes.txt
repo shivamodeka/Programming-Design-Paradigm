@@ -1,0 +1,32 @@
+TA-1 Name: - Abhishek Indukumar
+TA-2 Name: - Prasad
+
+Student CCIS ID: shivamodeka
+
+Problem Set #: set04
+Question Codewalked: - 2
+
+Design Grade: - A
+Presentation Grade: - A
+
+
+================
+
+Data Design:
+
+-- Ball list template missing some parts
+
+================
+
+Contract/Purpose Statement/Design Strategy:
+
+-- Functions need to be modularized
+
+-- Few functions missing examples
+
+-- Define constants for magic strings
+
+================
+
+
+

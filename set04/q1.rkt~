@@ -1,0 +1,169 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname q1) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+(require "extras.rkt")
+(require rackunit)
+
+(check-location "04" "q1.rkt")
+
+(provide
+ inner-product
+ permutation-of?
+ shortlex-less-than?
+ permutations)
+
+;; inner-product : RealList RealList -> Real
+;; GIVEN: two lists of real numbers
+;; WHERE: the two lists have the same length
+;; RETURNS: the inner product of those lists
+;; EXAMPLES:
+;;     (inner-product (list 2.5) (list 3.0))  =>  7.5
+;;     (inner-product (list 1 2 3 4) (list 5 6 7 8))  =>  70
+;;     (inner-product (list) (list))  =>  0
+;; STRATEGY : Combine simpler functions
+
+(define (inner-product lst1 lst2)
+  (cond
+    [(or (empty? lst1)(empty? lst2)) 0]
+    [else (+ (* (first lst1) (first lst2))
+        (inner-product (rest lst1) (rest lst2)))]))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; GIVEN: two lists of integers
+;; WHERE: neither list contains duplicate elements
+;; RETURNS: true if and only if one of the lists
+;;     is a permutation of the other
+;; EXAMPLES:
+;;     (permutation-of? (list 1 2 3) (list 1 2 3)) => true
+;;     (permutation-of? (list 3 1 2) (list 1 2 3)) => true
+;;     (permutation-of? (list 3 1 2) (list 1 2 4)) => false
+;;     (permutation-of? (list 1 2 3) (list 1 2)) => false
+;;     (permutation-of? (list) (list)) => true
+;;STRATEGY : Combine simpler functions
+
+(define (permutation-of? lst1 lst2)
+  (and (member-of? lst1 lst2) (member-of? lst2 lst1)))
+
+(define (member-of? lst1 lst2)
+  (cond
+    [(empty? lst1) true]
+    [(and (member (first lst1) lst2) (member-of? (rest lst1) lst2)) true]
+    [else false]))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; GIVEN: two lists of integers
+;; RETURNS: true if and only either
+;;     the first list is shorter than the second
+;;  or both are non-empty, have the same length, and either
+;;         the first element of the first list is less than
+;;             the first element of the second list
+;;      or the first elements are equal, and the rest of
+;;             the first list is less than the rest of the
+;;             second list according to shortlex-less-than?
+;; EXAMPLES:
+;;     (shortlex-less-than? (list) (list)) => false
+;;     (shortlex-less-than? (list) (list 3)) => true
+;;     (shortlex-less-than? (list 3) (list)) => false
+;;     (shortlex-less-than? (list 3) (list 3)) => false
+;;     (shortlex-less-than? (list 3) (list 1 2)) => true
+;;     (shortlex-less-than? (list 3 0) (list 1 2)) => false
+;;     (shortlex-less-than? (list 0 3) (list 1 2)) => true
+;;STRATEGY : Combine simpler functions
+
+
+(define (shortlex-less-than? lst1 lst2)
+  (cond
+    [(< (length lst1) (length lst2)) true]
+    
+    [(and (and (cons? lst1) (cons? lst2))
+          (= (length lst1) (length lst2))
+          (or (< (first lst1) (first lst2))
+              (and (= (first lst1) (first lst2))
+          (shortlex-less-than? (rest lst1) (rest lst2)))))
+          true]
+
+    [else false]))
+
+(begin-for-test
+           (check-equal?
+(shortlex-less-than? (list) (list)) false)
+           (check-equal?
+(shortlex-less-than? (list) (list 3)) true)
+           (check-equal?
+(shortlex-less-than? (list 3) (list))  false)
+           (check-equal?
+(shortlex-less-than? (list 3) (list 3)) false)
+           (check-equal?
+(shortlex-less-than? (list 3) (list 1 2)) true)
+           (check-equal?
+(shortlex-less-than? (list 3 0) (list 1 2)) false)
+           (check-equal?
+(shortlex-less-than? (list 0 3) (list 1 2)) true)
+
+(check-equal?
+ (inner-product (list 2.5) (list 3.0)) 7.5)
+    (check-equal?
+     (inner-product (list 1 2 3 4) (list 5 6 7 8)) 70)
+          (check-equal?
+           (inner-product (list) (list)) 0)
+
+(check-equal?
+ (permutation-of? (list 1 2 3) (list 1 2 3)) true)
+         (check-equal?
+          (permutation-of? (list 3 1 2) (list 1 2 3)) true)
+         (check-equal?
+          (permutation-of? (list 3 1 2) (list 1 2 4))false)
+          (check-equal?
+           (permutation-of? (list 1 2 3) (list 1 2))false)
+          (check-equal?
+           (permutation-of? (list) (list))true))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;; permutations : IntList -> IntListList
+          ;;; GIVEN: a list of integers
+          ;;; WHERE: the list contains no duplicates
+          ;;; RETURNS: a list of all permutations of that list,
+          ;;;     in shortlex order
+          ;;; EXAMPLES:
+          ;;;     (permutations (list))  =>  (list (list))
+          ;;;     (permutations (list 9))  =>  (list (list 9))
+          ;;;     (permutations (list 3 1 2))
+          ;;;         =>  (list (list 1 2 3)
+          ;;;                   (list 1 3 2)
+          ;;;                   (list 2 1 3)
+          ;;;                   (list 2 3 1)
+          ;;;                   (list 3 1 2)
+          ;;;                   (list 3 2 1))
+
+(define (permutations lst)
+  (cond
+    [(empty? lst) empty]
+    [else 
+
+(define (insert f l)
+  (cond
+    [(empty? l) empty]
+    [else (cons (arrange(list) (cons f l))
+                (insert f (rest l)))]))
+
+(define (arrange h list)
+  (cond
+    [(empty? list) empty]
+  [else (cons list (append h (arrange (cons (first list) h)(rest list))))]))
+
+
+
+(define (swap lst f s)
+  (cond
+    [(empty? lst) empty]
+    [(= (first lst) f)
+     (cons s (swap (rest lst) f s))]
+     [(= (first lst) s)
+     (cons f (swap (rest lst) f s))]
+     [else (cons (first lst) (swap(rest lst) f s))]
+     ))
+     

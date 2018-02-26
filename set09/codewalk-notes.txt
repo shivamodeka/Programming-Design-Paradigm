@@ -1,0 +1,23 @@
+TA-1 Name: - Abay
+TA-2 Name: - Krishna
+
+Student CCIS ID: shivamodeka
+
+Problem Set #: set09
+Question Codewalked: - q2
+
+Q1 Design Grade: - 
+Q1 Presentation Grade: -
+
+Q2 Design Grade: - AB
+Q2 Presentation Grade: - A
+
+Notes:
+=============================
+- return null for void types
+- outranks method in Competitor
+  - outranks.size increases in a for loop
+    - hence the invariants and halting measure needs to be documented
+- createComplist in Competitor1
+  - could have added first and second, why check all conditions ?
+  - compList can be set not a list

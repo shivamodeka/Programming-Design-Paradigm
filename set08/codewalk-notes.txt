@@ -1,0 +1,49 @@
+TA-1 Name: - Preethi
+TA-2 Name: - Prasad
+
+Student CCIS ID: shivamodeka
+
+Problem Set #: set08
+Question Codewalked: - Q1
+
+Q1 Design Grade: - AB
+Q1 Presentation Grade: - A
+
+Q2 Design Grade: - 
+Q2 Presentation Grade: -
+
+================
+
+Examples and Tests:
+
+-- 100% test coverage
+
+================
+
+Data Design:
+
+-- defined required structures
+
+================
+
+Contract/Purpose Statement/Design Strategy:
+
+-- missing contracts, purpose statement for all lambda functions
+
+================
+
+Presentation:
+
+-- what is halting measure - explaiend
+
+-- explained halting measure for function outranks, outcome
+
+================
+
+Other:
+
+================
+
+
+
+

@@ -1,0 +1,33 @@
+TA-1 Name: Vinod
+TA-2 Name: Nisarg
+
+Student CCIS ID: shivamodeka
+
+Problem Set #: set03
+Question Codewalked: 2
+
+Design Grade: AB
+Presentation Grade: A
+
+================
+
+Data Design:
+
+-- Redundant fields in the world state
+
+================
+
+Contract/Purpose Statement/Design Strategy:
+
+-- Stay within 80-characters per line
+-- Use standard type names
+-- Use standard formatting (avoid lone parentheses in a line), use proper indentation to indicate hierarchy
+-- Missing examples for some functions
+-- Use function names that reveal its purpose (eg. "left-wall" ?? What does it take? Return?)
+-- Include error messages with tests
+
+================
+
+Presentation:
+
+-- Good presentation overall

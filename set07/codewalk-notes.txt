@@ -1,0 +1,30 @@
+TA-1 Name: - Vinod
+TA-2 Name: - Rohan
+
+Student CCIS ID: shivamodeka
+
+Problem Set #: set07
+Question Codewalked: - Q2
+
+Design Grade: - AB
+Presentation Grade: - AB
+
+================
+
+Contract/Purpose Statement/Design Strategy:
+
+Check-block - if statement could have been in another helper function
+Calls-variable - could have used HOF
+type data should have ‘t’ capitalized
+Check-var - could have used HOF
+
+================
+
+Presentation:
+
+Could not defend why HOF was not used. 
+Need to revise HOFs
+
+================
+
+

@@ -1,0 +1,29 @@
+TA-1 Name: - Krishnavikas
+TA-2 Name: - Rohan
+
+Student CCIS ID: shivamodeka
+
+Problem Set #: set06
+Question Codewalked: - Q1
+
+Design Grade: - A
+Presentation Grade: - A
+
+INSTRUCTIONS TO TAs: Delete items that do not apply.  For items that apply,
+indicate which data definitions/functions have the indicated problem.
+
+================
+
+Contract/Purpose Statement/Design Strategy:
+
+Good. Keep it up!!
+
+================
+
+Presentation:
+
+Could answer all question related to HOF and apply function
+
+================
+
+

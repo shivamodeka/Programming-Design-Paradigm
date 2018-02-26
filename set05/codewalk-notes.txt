@@ -1,0 +1,39 @@
+TA-1 Name: - Krishna	
+TA-2 Name: - Nisarg
+
+Student CCIS ID: shivamodeka
+
+Problem Set #: set05
+Question Codewalked: - q2.rkt
+
+Design Grade: - A
+Presentation Grade: - AB
+
+================
+
+Examples and Tests:
+
+================
+
+Data Design:
+-- missing contract in observer templates of data definitions (Variable, Literal, etc)
+
+================
+
+Contract/Purpose Statement/Design Strategy:
+
+================
+
+Presentation:
+-- Got confused when asked whether you check block-rhs while evaluating constant-expression-value 
+
+================
+
+Other:
+-- could have used helper function instead of using if condition in a cond statement
+
+================
+
+
+
+

@@ -1,0 +1,33 @@
+TA-1 Name: - Yasaman Ahrabi
+TA-2 Name: - Rahul Verma
+
+Student CCIS ID: shivamodeka
+
+Problem Set #: set10
+Question Codewalked: -
+
+Q1 Design Grade: - AB
+Q1 Presentation Grade: - A
+
+Q2 Design Grade: - AB
+Q2 Presentation Grade: - A
+
+Presentation:
+
+================
+
+Interfaces, Objects, and Classes
+
+-- should have description of class and data members.
+-- should not typecast to roster in equals, compare should not consider anything about the inner object implementation.
+
+================
+
+Other:
+
+
+================
+
+
+
+
